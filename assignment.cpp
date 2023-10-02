@@ -47,6 +47,7 @@
 #include<iostream>
 #include<boost/filesystem.hpp>
 #include<boost/filesystem/fstream.hpp>
+#include <boost/algorithm/string.hpp>
 #include<string.h>
 #include<vector>
 using namespace std;
@@ -72,18 +73,40 @@ map<string,int> eventListToMap(vector<int> eventID){
     }
     return eventMap;
 }
+
+vector<string> stringSplitter(string* str){
+    string substr = str->substr(4, str->length()-1);
+
+    vector<string> parts;
+    boost::split(parts,substr,boost::is_any_of(","));
+    return parts;
+}
+
 bool readlogfile(char* datafile){
+
+    map<string,RUIClass> mapRUI;
+    map<string,Banner> mapBanner;
+
     boost::filesystem::ifstream fileHandler(datafile);
-    string line;
+    string line; 
 
     while (getline(fileHandler, line)){
-        
-        cout <<"End of File." << endl; 
+        if(line.substr(0,3) == "sel"){
+        vector<string> split  = stringSplitter(&line);
+        if (mapRUI.find(split[1]) != mapRUI.end()){
+        }
     }
-
+    cout <<"End of File." << endl;
     return true;
 }
+
 int main(int argc, char* argv[]){
-    readlogfile(argv[1]);
+    // readlogfile(argv[1]);
+    string strSample = "sel:6,b94c672a-6185-43e0-be4f-d92d36a1aa97,Banner-16,12.022";
+    vector<string> splitSample = stringSplitter(&strSample);
+
+    for (const auto& element : splitSample){
+        cout << element << " ";
+    }   
         return 0;
 }
