@@ -65,8 +65,25 @@ class RUIClass{
         float banner_cost;
 };
 
+map<string,int> eventListtoMap(vector<int> eventID){
+    map<string,int> eventMap;
+    for(int i: eventID){
+        eventMap[to_string(i)] +=1;
+    }
+    return eventMap;
+}
 
 int main(int argc, char* argv[]){
-    printf(argv[1]);
+    boost::filesystem::ifstream fileHandler(argv[1]);
+    string line;
+    vector<int> event_sam {1,2,3,1,2,4,0,0,1};
+    map<string,int> eLM  = eventListtoMap(event_sam);
+    for(auto iter = eLM.begin();iter!=eLM.end();iter++){
+        cout << "{" << (*iter).first << ": " << (*iter).second << "}\n";
+    }
+    // while (getline(fileHandler, line)) {
+    //     cout << line << endl;
+    // }
+
     return 0;
 }
