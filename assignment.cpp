@@ -66,6 +66,7 @@ class RUIClass{
 };
 
 
-int main(){
-    std::cout<<1<<endl;
+int main(int argc, char* argv[]){
+    printf(argv[1]);
+    return 0;
 }
