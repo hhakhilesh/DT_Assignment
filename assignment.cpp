@@ -53,17 +53,33 @@
 using namespace std;
 
 class Banner{
-        string banner_ID;
-        float cost;
-        map<int,int> eventOccuMap; //(eventID,occurences)
+    public:
+        string bannerID;
+        float banner_cost;
+        map<string,string> eventOccuMap; //(eventID,occurences)
         float revenue;
+    Banner(const string& bannerID="",const float banner_cost=0.0f)
+    :bannerID(bannerID),banner_cost(banner_cost){}
+
+    void setRevenue(){
+        revenue = stof(eventOccuMap[to_string(1)])*banner_cost;
+    }
 };
 
 class RUIClass{
+    public:
         string RUI_ID;
         vector<int> eventIDlist;
         string bannerID;
         float banner_cost;
+
+    RUIClass(const std::string& RUI_ID ="",int eventAdd =-1)
+        :RUI_ID(RUI_ID){if(eventAdd!=-1){eventIDlist.push_back(eventAdd);}
+    }
+    
+    RUIClass(const std::string& RUI_ID ="",const string& bannerID ="", float banner_cost = 0.0f)
+    :RUI_ID(RUI_ID),bannerID(bannerID),banner_cost(banner_cost){
+    }
 };
 
 map<string,int> eventListToMap(vector<int> eventID){
@@ -96,17 +112,20 @@ bool readlogfile(char* datafile){
         if (mapRUI.find(split[1]) != mapRUI.end()){
         }
     }
+    }
     cout <<"End of File." << endl;
     return true;
 }
 
 int main(int argc, char* argv[]){
     // readlogfile(argv[1]);
-    string strSample = "sel:6,b94c672a-6185-43e0-be4f-d92d36a1aa97,Banner-16,12.022";
-    vector<string> splitSample = stringSplitter(&strSample);
+    // string strSample = "sel:6,b94c672a-6185-43e0-be4f-d92d36a1aa97,Banner-16,12.022";
+    // vector<string> splitSample = stringSplitter(&strSample);
+    // Banner sampleA("Banner-7",8.12);
+    // sampleA.banner_cost = 2.11;
 
-    for (const auto& element : splitSample){
-        cout << element << " ";
-    }   
-        return 0;
+    // cout<<sampleA.bannerID<<endl;
+    // cout<<sampleA.banner_cost<<endl;
+
+    return 0;
 }
