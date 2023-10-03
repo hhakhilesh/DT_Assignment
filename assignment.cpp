@@ -56,13 +56,14 @@ class Banner{
     public:
         string bannerID;
         double banner_cost;
-        map<string,string> eventOccuMap; //(eventID,occurences)
+        vector<int> eventsList;
+        map<string,int> eventOccuMap; //(eventID,occurences)
         double revenue;
     Banner(const string& bannerID="",const double banner_cost=0.0f)
     :bannerID(bannerID),banner_cost(banner_cost){}
 
     void setRevenue(){
-        revenue = stod(eventOccuMap[to_string(1)])*banner_cost;
+        revenue = (eventOccuMap[to_string(1)])*banner_cost;
     }
 };
 
@@ -141,8 +142,8 @@ bool checkline(string* line){
 
     return validLine;
     }
-    
-bool readlogfile(char* datafile){
+
+bool logtoxml(char* datafile){
 
     map<string,RUIClass*> mapRUI;
     map<string,Banner*> mapBanner;
@@ -164,7 +165,7 @@ bool readlogfile(char* datafile){
         if(line.substr(0,3) == "sel"){
         
             if (mapRUI.find(split[1]) != mapRUI.end()){
-                cout<<split[1];
+                // cout<<split[1];
                 // mapRUI[split[1]].bannerID = split[2];
                 // mapRUI[split[1]].banner_cost = stof(split[3]);
                 auto inst = mapRUI.find(split[1])->second;
@@ -199,38 +200,45 @@ bool readlogfile(char* datafile){
         
     }
 
-    cout <<"End of File. Total lines parsed = "<<linenum<<endl;
+    cout <<"Total lines parsed = "<<linenum<<endl;
     
     
-    for (auto& pair: mapRUI){
-        std::string key = pair.first;
-        RUIClass* instance = pair.second;
+    // for (auto& pair: mapRUI){
+    //     std::string key = pair.first;
+    //     RUIClass* instance = pair.second;
 
-        cout<<"Map Key:"<<key<<endl;
-        cout<<"RUI_ID from RUI_Class: "<<instance->RUI_ID<<endl;
-    }
+    //     cout<<"Map Key:"<<key<<endl;
+    //     cout<<"RUI_ID from RUI_Class: "<<instance->RUI_ID<<endl;
+    // }
     
     cout<<"End of mapRUI"<<endl;
+    // Get eventIDs from RUI to Banners and calculate revenue
+    for (auto& Bpair: mapBanner){
 
-    for (auto& pair: mapBanner){
-        std::string key = pair.first;
-        Banner* instance = pair.second;
+        std::string Bkey = Bpair.first;
+        Banner* Binst = Bpair.second;
+        
+        for(auto& Rpair: mapRUI){
+            std::string Rkey = Rpair.first;
+            RUIClass* Rinst = Rpair.second;
 
-        cout<<"Map Key:"<<key<<endl;
-        cout<<"BannerID: "<<instance->bannerID<<endl;
+            if(Bkey==Rinst->bannerID){
+                Binst->eventsList.insert(Binst->eventsList.end(),
+                Rinst->eventIDlist.begin(),Rinst->eventIDlist.end());
+            }
+        }
+        map<string,int> evO = eventListToMap(Binst->eventsList);
+        Binst->eventOccuMap = evO;
+        Binst->setRevenue();
+        cout<<endl<<"The revenue for "<<Binst->bannerID<<" is "<<Binst->revenue<<endl;
     }
+    
+
     return true;
 }
 
 int main(int argc, char* argv[]){
-    readlogfile(argv[1]);
-    // string strSample = "sel:6,b94c672a-6185-43e0-be4f-d92d36a1aa97,Banner-16,12.022";
-    // vector<string> splitSample = stringSplitter(&strSample);
-    // Banner sampleA("Banner-7",8.12);
-    // sampleA.banner_cost = 2.11;
-
-    // cout<<sampleA.bannerID<<endl;
-    // cout<<sampleA.banner_cost<<endl;
-
+    logtoxml(argv[1]);
+    
     return 0;
 }
