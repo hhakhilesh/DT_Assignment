@@ -98,7 +98,50 @@ vector<string> stringSplitter(string* str){
     return parts;
 }
 
+bool checkline(string* line){
 
+    string linedata = line->substr(4, line->length()-1);
+    string prefix = line->substr(0,3);
+    bool validLine=false;
+
+    if(prefix=="sel"||prefix =="cnt"){
+
+        vector<string> parts;
+        boost::split(parts,linedata,boost::is_any_of(","));
+
+        if(prefix=="sel"){
+            // cout<<parts.size()<<endl;
+
+            if((parts.size()==4)){
+                // cout<<parts[1].length()<<endl;
+
+                if((parts[1].length()==36)){
+                    // cout<<parts[2].substr(0,6)<<endl;
+
+                    if((parts[2].substr(0,6)=="Banner")){
+
+                        validLine=true;
+                    }
+                }
+            }
+       }
+
+        if(prefix=="cnt"){
+
+            if((parts.size()==2)){
+
+                if(parts[1].length()==36){
+
+                    validLine=true;
+                }
+            }
+        }
+    }
+    else{validLine = false;}
+
+    return validLine;
+    }
+    
 bool readlogfile(char* datafile){
 
     map<string,RUIClass*> mapRUI;
@@ -106,9 +149,16 @@ bool readlogfile(char* datafile){
 
     boost::filesystem::ifstream fileHandler(datafile);
     string line; 
+    int linenum= 0;
 
     while (getline(fileHandler, line)){
-       
+        linenum++;
+        if(!checkline(&line)){
+            cout<<"Line format invalid for line "<<linenum<<".Line Content: "<<line<<endl;
+            cout<<"Skipping Line>>>>>>>>>>>>>>>"<<endl;
+            continue;
+        }
+        
         vector<string> split  = stringSplitter(&line);
 
         if(line.substr(0,3) == "sel"){
@@ -149,7 +199,8 @@ bool readlogfile(char* datafile){
         
     }
 
-    cout <<"End of File." << endl;
+    cout <<"End of File. Total lines parsed = "<<linenum<<endl;
+    
     
     for (auto& pair: mapRUI){
         std::string key = pair.first;
@@ -168,8 +219,6 @@ bool readlogfile(char* datafile){
         cout<<"Map Key:"<<key<<endl;
         cout<<"BannerID: "<<instance->bannerID<<endl;
     }
-    
-    
     return true;
 }
 
