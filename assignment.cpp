@@ -48,6 +48,11 @@
 #include<boost/filesystem.hpp>
 #include<boost/filesystem/fstream.hpp>
 #include <boost/algorithm/string.hpp>
+// #include<boost/property_tree/ptree.hpp>
+// #include<boost/property_tree/xml_parser.hpp>
+#include<boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include "pugixml.cpp"
 #include<string.h>
 #include<vector>
 using namespace std;
@@ -76,11 +81,19 @@ class RUIClass{
         
 
     RUIClass(const std::string& RUI_ID,int eventAdd)
-        :RUI_ID(RUI_ID){if(eventAdd!=-1){eventIDlist.push_back(eventAdd);}
+        :RUI_ID(RUI_ID){
+            if(eventAdd!=-1){
+            eventIDlist.push_back(eventAdd);
+            cout<<eventAdd<<" line 87"<<endl;
+            }
     }
     
-    RUIClass(const std::string& RUI_ID ,const string& bannerID,const double& banner_cost)
+    RUIClass(int eventAdd,const std::string& RUI_ID ,const string& bannerID,const double& banner_cost)
     :RUI_ID(RUI_ID),bannerID(bannerID),banner_cost(banner_cost){
+        if(eventAdd!=-1){
+            eventIDlist.push_back(eventAdd);
+            cout<<eventAdd<<" line 95"<<endl;
+            }
     }
 };
 
@@ -143,7 +156,7 @@ bool checkline(string* line){
     return validLine;
     }
 
-bool logtoxml(char* datafile){
+map<string,Banner*> logtoBanner(char* datafile){
 
     map<string,RUIClass*> mapRUI;
     map<string,Banner*> mapBanner;
@@ -171,10 +184,11 @@ bool logtoxml(char* datafile){
                 auto inst = mapRUI.find(split[1])->second;
                 inst->bannerID = split[2];
                 inst->banner_cost =stof(split[3]);
+                inst->eventIDlist.push_back(stoi(split[0]));
             }
 
             else{
-                RUIClass* ruiInstance = new RUIClass(split[1],split[2],stof(split[3]));
+                RUIClass* ruiInstance = new RUIClass(stoi(split[0]),split[1],split[2],stof(split[3]));
                 mapRUI[split[1]] = ruiInstance;
             }
 
@@ -232,13 +246,48 @@ bool logtoxml(char* datafile){
         Binst->setRevenue();
         cout<<endl<<"The revenue for "<<Binst->bannerID<<" is "<<Binst->revenue<<endl;
     }
-    
 
-    return true;
+    return mapBanner;
+}
+
+int BannertoXML(map<string,Banner*> BannersMap){
+
+    pugi::xml_document doc;
+    int numBanners = BannersMap.size();
+
+    pugi::xml_node banners = doc.append_child("Banners");
+
+    for(auto& Bpair: BannersMap){
+
+        std::string Bkey = Bpair.first;
+        Banner* Binst = Bpair.second;
+
+        pugi::xml_node banner = banners.append_child("Banner");
+        
+        banner.append_attribute("id") = (Binst->bannerID).c_str();
+        banner.append_attribute("revenues") = round((Binst->revenue) * 100)/100.0;
+      
+        pugi::xml_node events = banner.append_child("Events");
+
+        for(auto& Epair: Binst->eventOccuMap){
+
+            std::string eventID = Epair.first;
+            int occur = Epair.second;
+            if (occur>0){
+
+                pugi::xml_node event = events.append_child("Event");
+                event.append_attribute("id")= stoi(eventID);
+                event.text() = occur;
+            }
+        }
+    }
+
+    doc.save_file("outputpugi.xml");
+    return 0;
 }
 
 int main(int argc, char* argv[]){
-    logtoxml(argv[1]);
-    
+    map<string,Banner*> Banners = logtoBanner(argv[1]);
+    int output = BannertoXML(Banners);
     return 0;
 }

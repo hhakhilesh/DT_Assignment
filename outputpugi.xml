@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Banners>
+	<Banner id="Banner-55" revenues="45.32">
+		<Events>
+			<Event id="1">1</Event>
+			<Event id="114">1</Event>
+			<Event id="6">1</Event>
+		</Events>
+	</Banner>
+	<Banner id="Banner-6" revenues="0">
+		<Events>
+			<Event id="106">1</Event>
+			<Event id="114">1</Event>
+			<Event id="6">1</Event>
+		</Events>
+	</Banner>
+	<Banner id="Banner-71" revenues="6.4500000000000002">
+		<Events>
+			<Event id="1">1</Event>
+			<Event id="114">2</Event>
+			<Event id="6">2</Event>
+		</Events>
+	</Banner>
+</Banners>
