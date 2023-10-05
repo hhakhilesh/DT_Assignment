@@ -1,10 +1,9 @@
-'''
+Compile and link with:
+```
 g++ assignment.cpp -o assignment
+```
 
-'''
-
-Run the executable that takes an data.log file:
-
-'''
+Run the executable that takes a data.log file:
+```
  ./assignment trialdata.log
-'''
+```
